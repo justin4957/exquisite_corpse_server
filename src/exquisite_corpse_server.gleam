@@ -40,7 +40,8 @@ pub fn main() {
 
   // Initialize database
   let assert Ok(db_connection) = database.initialize(database_path)
-  let ctx = Context(db_connection: db_connection, static_directory: static_directory)
+  let ctx =
+    Context(db_connection: db_connection, static_directory: static_directory)
 
   // Create request handler with middleware
   let handler = fn(request) {

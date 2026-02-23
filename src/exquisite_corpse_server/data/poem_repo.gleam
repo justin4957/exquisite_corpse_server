@@ -46,7 +46,11 @@ pub fn create(
     "INSERT INTO poems (id, total_lines, seed_line) VALUES (?, ?, ?)
      RETURNING id, total_lines, status, title, seed_line, version, created_at, updated_at",
     on: connection,
-    with: [sqlight.text(id_string), sqlight.int(total_lines), sqlight.text(seed_line)],
+    with: [
+      sqlight.text(id_string),
+      sqlight.int(total_lines),
+      sqlight.text(seed_line),
+    ],
     expecting: poem_decoder(),
   ))
 
@@ -54,7 +58,11 @@ pub fn create(
   use _ <- result_try(sqlight.query(
     "INSERT INTO poem_lines (poem_id, line_number, full_text, visible_hint) VALUES (?, 1, ?, ?)",
     on: connection,
-    with: [sqlight.text(id_string), sqlight.text(seed_line), sqlight.text(seed_hint)],
+    with: [
+      sqlight.text(id_string),
+      sqlight.text(seed_line),
+      sqlight.text(seed_hint),
+    ],
     expecting: decode.success(Nil),
   ))
 
@@ -80,8 +88,7 @@ pub fn get_by_id(
     )
   {
     Ok([poem]) -> Ok(poem)
-    Ok(_) ->
-      Error(sqlight.SqlightError(sqlight.Notfound, "Poem not found", -1))
+    Ok(_) -> Error(sqlight.SqlightError(sqlight.Notfound, "Poem not found", -1))
     Error(error) -> Error(error)
   }
 }
@@ -163,8 +170,7 @@ pub fn update_status(
   ))
   case rows {
     [_] -> Ok(Nil)
-    _ ->
-      Error(sqlight.SqlightError(sqlight.Notfound, "Poem not found", -1))
+    _ -> Error(sqlight.SqlightError(sqlight.Notfound, "Poem not found", -1))
   }
 }
 
@@ -184,8 +190,7 @@ pub fn set_title(
   ))
   case rows {
     [_] -> Ok(Nil)
-    _ ->
-      Error(sqlight.SqlightError(sqlight.Notfound, "Poem not found", -1))
+    _ -> Error(sqlight.SqlightError(sqlight.Notfound, "Poem not found", -1))
   }
 }
 
@@ -228,10 +233,7 @@ fn poem_summary_decoder() -> decode.Decoder(PoemSummary) {
 }
 
 /// Helper to chain Result operations consistently.
-fn result_try(
-  result: Result(a, e),
-  next: fn(a) -> Result(b, e),
-) -> Result(b, e) {
+fn result_try(result: Result(a, e), next: fn(a) -> Result(b, e)) -> Result(b, e) {
   case result {
     Ok(value) -> next(value)
     Error(error) -> Error(error)

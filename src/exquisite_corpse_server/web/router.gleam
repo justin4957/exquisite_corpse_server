@@ -7,10 +7,7 @@ import simplifile
 import wisp
 
 /// Dispatches requests to the appropriate handler.
-pub fn handle_request(
-  request: wisp.Request,
-  ctx: Context,
-) -> wisp.Response {
+pub fn handle_request(request: wisp.Request, ctx: Context) -> wisp.Response {
   case wisp.path_segments(request) {
     // API routes
     ["api", "poems"] ->

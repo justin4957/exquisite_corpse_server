@@ -101,8 +101,7 @@ pub fn get_last_line(
     )
   {
     Ok([line]) -> Ok(line)
-    Ok(_) ->
-      Error(sqlight.SqlightError(sqlight.Notfound, "No lines found", -1))
+    Ok(_) -> Error(sqlight.SqlightError(sqlight.Notfound, "No lines found", -1))
     Error(error) -> Error(error)
   }
 }

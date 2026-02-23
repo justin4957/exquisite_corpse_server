@@ -15,10 +15,7 @@ import sqlight
 import wisp
 
 /// POST /api/poems — Create a new poem.
-pub fn create_poem(
-  request: wisp.Request,
-  ctx: Context,
-) -> wisp.Response {
+pub fn create_poem(request: wisp.Request, ctx: Context) -> wisp.Response {
   use json_body <- wisp.require_json(request)
 
   let total_lines_decoder = {
@@ -57,7 +54,10 @@ pub fn create_poem(
                 json.object([
                   #("id", json.string(created_poem.id)),
                   #("total_lines", json.int(created_poem.total_lines)),
-                  #("status", json.string(poem_status.to_string(created_poem.status))),
+                  #(
+                    "status",
+                    json.string(poem_status.to_string(created_poem.status)),
+                  ),
                   #("seed_line", json.string(created_poem.seed_line)),
                   #("visible_hint", json.string(seed_poem_line.visible_hint)),
                   #("version", json.int(created_poem.version)),
@@ -77,10 +77,7 @@ pub fn create_poem(
 }
 
 /// GET /api/poems — List poems with optional status filter.
-pub fn list_poems(
-  request: wisp.Request,
-  ctx: Context,
-) -> wisp.Response {
+pub fn list_poems(request: wisp.Request, ctx: Context) -> wisp.Response {
   let query_params = wisp.get_query(request)
   let status_filter =
     list.key_find(query_params, "status")
@@ -107,8 +104,7 @@ pub fn list_poems(
         |> json.to_string
       wisp.json_response(response_json, 200)
     }
-    Error(sqlight_error) ->
-      api_error.from_database_error(sqlight_error.message)
+    Error(sqlight_error) -> api_error.from_database_error(sqlight_error.message)
   }
 }
 
@@ -157,8 +153,7 @@ pub fn get_poem(ctx: Context, poem_id: String) -> wisp.Response {
     }
     Error(sqlight.SqlightError(sqlight.Notfound, _, _)) ->
       api_error.not_found("Poem not found")
-    Error(sqlight_error) ->
-      api_error.from_database_error(sqlight_error.message)
+    Error(sqlight_error) -> api_error.from_database_error(sqlight_error.message)
   }
 }
 
@@ -231,9 +226,18 @@ pub fn add_line(
                               let new_version = expected_version + 1
                               let response_json =
                                 json.object([
-                                  #("line_number", json.int(inserted_line.line_number)),
-                                  #("full_text", json.string(inserted_line.full_text)),
-                                  #("visible_hint", json.string(inserted_line.visible_hint)),
+                                  #(
+                                    "line_number",
+                                    json.int(inserted_line.line_number),
+                                  ),
+                                  #(
+                                    "full_text",
+                                    json.string(inserted_line.full_text),
+                                  ),
+                                  #(
+                                    "visible_hint",
+                                    json.string(inserted_line.visible_hint),
+                                  ),
                                   #("version", json.int(new_version)),
                                   #("is_complete", json.bool(is_complete)),
                                 ])
@@ -273,7 +277,9 @@ pub fn add_line(
       }
     }
     Error(_) ->
-      api_error.bad_request("Invalid request body: requires 'text' and 'version' fields")
+      api_error.bad_request(
+        "Invalid request body: requires 'text' and 'version' fields",
+      )
   }
 }
 
@@ -362,13 +368,11 @@ pub fn reveal_poem(ctx: Context, poem_id: String) -> wisp.Response {
               api_error.from_database_error(sqlight_error.message)
           }
         }
-        poem_status.Active ->
-          api_error.bad_request("Poem is not yet complete")
+        poem_status.Active -> api_error.bad_request("Poem is not yet complete")
       }
     }
     Error(sqlight.SqlightError(sqlight.Notfound, _, _)) ->
       api_error.not_found("Poem not found")
-    Error(sqlight_error) ->
-      api_error.from_database_error(sqlight_error.message)
+    Error(sqlight_error) -> api_error.from_database_error(sqlight_error.message)
   }
 }

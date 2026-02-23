@@ -150,8 +150,7 @@ pub fn get_poem_by_id_test() {
   let connection = setup_test_db()
   let assert Ok(created_poem) =
     poem_repo.create(connection, 7, "test seed line", "seed line")
-  let assert Ok(fetched_poem) =
-    poem_repo.get_by_id(connection, created_poem.id)
+  let assert Ok(fetched_poem) = poem_repo.get_by_id(connection, created_poem.id)
   assert fetched_poem.id == created_poem.id
   assert fetched_poem.total_lines == 7
 }
@@ -167,12 +166,10 @@ pub fn get_poem_not_found_test() {
 
 pub fn list_poems_test() {
   let connection = setup_test_db()
-  let assert Ok(_) =
-    poem_repo.create(connection, 5, "first seed", "first seed")
+  let assert Ok(_) = poem_repo.create(connection, 5, "first seed", "first seed")
   let assert Ok(_) =
     poem_repo.create(connection, 7, "second seed", "second seed")
-  let assert Ok(all_poems) =
-    poem_repo.list(connection, option.None)
+  let assert Ok(all_poems) = poem_repo.list(connection, option.None)
   assert list.length(all_poems) == 2
 }
 
@@ -198,10 +195,8 @@ pub fn increment_version_test() {
   let assert Ok(created_poem) =
     poem_repo.create(connection, 11, "test seed", "seed")
   assert created_poem.version == 0
-  let assert Ok(_) =
-    poem_repo.increment_version(connection, created_poem.id, 0)
-  let assert Ok(updated_poem) =
-    poem_repo.get_by_id(connection, created_poem.id)
+  let assert Ok(_) = poem_repo.increment_version(connection, created_poem.id, 0)
+  let assert Ok(updated_poem) = poem_repo.get_by_id(connection, created_poem.id)
   assert updated_poem.version == 1
 }
 
@@ -274,8 +269,7 @@ pub fn update_poem_status_test() {
     poem_repo.create(connection, 11, "test seed", "seed")
   let assert Ok(_) =
     poem_repo.update_status(connection, created_poem.id, poem_status.Complete)
-  let assert Ok(updated_poem) =
-    poem_repo.get_by_id(connection, created_poem.id)
+  let assert Ok(updated_poem) = poem_repo.get_by_id(connection, created_poem.id)
   assert updated_poem.status == poem_status.Complete
 }
 
@@ -285,8 +279,7 @@ pub fn set_poem_title_test() {
     poem_repo.create(connection, 11, "test seed", "seed")
   let assert Ok(_) =
     poem_repo.set_title(connection, created_poem.id, "Moon beneath Waters")
-  let assert Ok(updated_poem) =
-    poem_repo.get_by_id(connection, created_poem.id)
+  let assert Ok(updated_poem) = poem_repo.get_by_id(connection, created_poem.id)
   assert updated_poem.title == "Moon beneath Waters"
 }
 
@@ -448,18 +441,33 @@ pub fn add_line_completes_poem_test() {
     poem_repo.create(connection, 5, "test seed line", "seed line")
   // Add lines 2-5 to complete the poem
   let assert Ok(_) =
-    poem_line_repo.add_line(connection, created_poem.id, 2, "line two", "line two")
+    poem_line_repo.add_line(
+      connection,
+      created_poem.id,
+      2,
+      "line two",
+      "line two",
+    )
   let assert Ok(_) =
-    poem_line_repo.add_line(connection, created_poem.id, 3, "line three", "line three")
+    poem_line_repo.add_line(
+      connection,
+      created_poem.id,
+      3,
+      "line three",
+      "line three",
+    )
   let assert Ok(_) =
-    poem_line_repo.add_line(connection, created_poem.id, 4, "line four", "line four")
+    poem_line_repo.add_line(
+      connection,
+      created_poem.id,
+      4,
+      "line four",
+      "line four",
+    )
   // Increment version to match
-  let assert Ok(_) =
-    poem_repo.increment_version(connection, created_poem.id, 0)
-  let assert Ok(_) =
-    poem_repo.increment_version(connection, created_poem.id, 1)
-  let assert Ok(_) =
-    poem_repo.increment_version(connection, created_poem.id, 2)
+  let assert Ok(_) = poem_repo.increment_version(connection, created_poem.id, 0)
+  let assert Ok(_) = poem_repo.increment_version(connection, created_poem.id, 1)
+  let assert Ok(_) = poem_repo.increment_version(connection, created_poem.id, 2)
   // Add the final line via API
   let line_body =
     json.object([
@@ -482,13 +490,37 @@ pub fn reveal_poem_endpoint_test() {
     poem_repo.create(connection, 5, "test seed line", "seed line")
   // Add 4 more lines to complete
   let assert Ok(_) =
-    poem_line_repo.add_line(connection, created_poem.id, 2, "second line words", "line words")
+    poem_line_repo.add_line(
+      connection,
+      created_poem.id,
+      2,
+      "second line words",
+      "line words",
+    )
   let assert Ok(_) =
-    poem_line_repo.add_line(connection, created_poem.id, 3, "third line words", "line words")
+    poem_line_repo.add_line(
+      connection,
+      created_poem.id,
+      3,
+      "third line words",
+      "line words",
+    )
   let assert Ok(_) =
-    poem_line_repo.add_line(connection, created_poem.id, 4, "fourth line words", "line words")
+    poem_line_repo.add_line(
+      connection,
+      created_poem.id,
+      4,
+      "fourth line words",
+      "line words",
+    )
   let assert Ok(_) =
-    poem_line_repo.add_line(connection, created_poem.id, 5, "fifth line words", "line words")
+    poem_line_repo.add_line(
+      connection,
+      created_poem.id,
+      5,
+      "fifth line words",
+      "line words",
+    )
   // Mark poem as complete
   let assert Ok(_) =
     poem_repo.update_status(connection, created_poem.id, poem_status.Complete)
@@ -553,7 +585,6 @@ pub fn migration_runs_idempotently_test() {
 pub fn database_initialize_test() {
   let assert Ok(connection) = database.initialize(":memory:")
   // Should be able to query the poems table
-  let assert Ok(poems) =
-    poem_repo.list(connection, option.None)
+  let assert Ok(poems) = poem_repo.list(connection, option.None)
   assert poems == []
 }
